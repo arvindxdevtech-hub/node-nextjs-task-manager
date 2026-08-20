@@ -1,82 +1,53 @@
 # Team Task Manager — Backend Learning Notes
-
-A practical backend learning project using **Node.js + Express.js + MongoDB + Mongoose + JWT + Socket.IO**.
+A practical backend learning project using ****Node.js + Express.js + MongoDB + Mongoose + JWT + Socket.IO****.
 
 ## 1. Project Overview
+****Project:**** `team-task-manager`
 
-**Project:** `team-task-manager`
+****Stack:**** Node.js, Express.js, MongoDB, Mongoose, JWT, bcryptjs, express-validator, dotenv, cors, Socket.IO, Nodemon.
 
-**Stack:** Node.js, Express.js, MongoDB, Mongoose, JWT, bcryptjs, express-validator, dotenv, cors, Socket.IO, Nodemon.
-
-**Roles:** `manager`, `employee`
+****Roles:**** `manager`, `employee`
 
 ```text
 Manager Login → JWT → Employee CRUD → Task Create/Assign → MongoDB
-
                                          ↓
-
                                    Socket.IO new-task
-
                                          ↓
-
                                       Employee
-
 Employee Login → JWT → My Tasks → Task Detail → Status Update → MongoDB
-
                                                    ↓
-
                                       Socket.IO task-status-updated
-
                                                    ↓
-
                                                 Manager
 ```
-
 ---
+
 
 ## Table of Contents
 
-1. [Project Overview](#1-project-overview)
-2. [Installation](#2-installation)
-3. [Environment](#3-environment)
-4. [Folder Structure](#4-folder-structure)
-5. [Main Request Flow](#5-main-request-flow)
-6. [Important Node / Express Concepts](#6-important-node--express-concepts)
-7. [MongoDB vs MySQL](#7-mongodb-vs-mysql)
-8. [Mongoose CRUD Methods](#8-mongoose-crud-methods)
-9. [`populate()`](#9-populate)
-10. [Models](#10-models)
-11. [Login / JWT Flow](#11-login--jwt-flow)
-12. [Role Authorization](#12-role-authorization)
-13. [Validation Flow](#13-validation-flow)
-14. [Socket.IO Core](#14-socketio-core)
-15. [Socket.IO Rooms](#15-socketio-rooms)
-16. [Realtime Task Assignment](#16-realtime-task-assignment)
-17. [Realtime Status Update](#17-realtime-status-update)
-18. [API URLs](#18-api-urls)
-19. [Common HTTP Status Codes](#19-common-http-status-codes)
-20. [Security Points](#20-security-points)
-21. [Task Filtering + Pagination](#20a-task-filtering--pagination)
-22. [Debugging / Learning Fixes](#20b-important-debugging--learning-fixes)
-23. [Backend vs Socket.IO Responsibility](#20c-backend-vs-socketio-responsibility)
-24. [Frontend Notification Persistence Note](#20d-frontend-notification-persistence-note)
-25. [Current Backend Progress](#21-current-backend-progress)
-26. [Quick Revision](#22-quick-revision)
-27. [Final Architecture](#23-final-architecture)
+- [Project Overview](#1-project-overview)
+- [Installation](#2-installation)
+- [Environment](#3-environment)
+- [Folder Structure](#4-folder-structure)
+- [Main Request Flow](#5-main-request-flow)
+- [Node / Express Concepts](#6-important-node--express-concepts)
+- [MongoDB vs MySQL](#7-mongodb-vs-mysql)
+- [Mongoose CRUD](#8-mongoose-crud-methods)
+- [Login / JWT](#11-login--jwt-flow)
+- [Socket.IO](#14-socketio-core)
+- [API URLs](#18-api-urls)
+- [Security](#20-security-points)
+- [Debugging Notes](#20b-important-debugging--learning-fixes)
+- [Quick Revision](#22-quick-revision)
+- [Final Architecture](#23-final-architecture)
 
 ---
-
 ## 2. Installation
-
 ```bash
 mkdir team-task-manager
-
 cd team-task-manager
-
 npm init -y
-
 npm install express mongoose dotenv bcryptjs jsonwebtoken express-validator cors socket.io
-
 npm install --save-dev nodemon
 ```
 
@@ -106,17 +77,11 @@ npm install --save-dev nodemon
 
 ```json
 {
-
   "type": "module",
-
   "scripts": {
-
     "start": "node index.js",
-
     "dev": "nodemon index.js"
-
   }
-
 }
 ```
 
@@ -125,20 +90,14 @@ Run:
 ```bash
 npm run dev
 ```
-
 ---
-
 ## 3. Environment
-
 `.env`
 
 ```env
 PORT=3000
-
 MONGODB_URI=mongodb://127.0.0.1:27017/team_task_manager
-
 JWT_SECRET=change_this_secret_for_learning
-
 JWT_EXPIRES_IN=1d
 ```
 
@@ -146,147 +105,77 @@ JWT_EXPIRES_IN=1d
 
 ```gitignore
 node_modules/
-
 .env
 ```
-
 ---
-
 ## 4. Folder Structure
-
 ```text
 team-task-manager/
-
 │
-
 ├── src/
-
 │   ├── config/
-
 │   │   └── database.js
-
 │   ├── controllers/
-
 │   │   ├── authController.js
-
 │   │   ├── employeeController.js
-
 │   │   ├── taskController.js
-
 │   │   └── employeeTaskController.js
-
 │   ├── middleware/
-
 │   │   ├── authMiddleware.js
-
 │   │   ├── managerMiddleware.js
-
 │   │   ├── employeeMiddleware.js
-
 │   │   ├── validationMiddleware.js
-
 │   │   └── errorMiddleware.js
-
 │   ├── models/
-
 │   │   ├── User.js
-
 │   │   └── Task.js
-
 │   ├── routes/
-
 │   │   ├── authRoutes.js
-
 │   │   ├── employeeRoutes.js
-
 │   │   ├── taskRoutes.js
-
 │   │   └── employeeTaskRoutes.js
-
 │   ├── validators/
-
 │   │   ├── employeeValidator.js
-
 │   │   └── taskValidator.js
-
 │   └── seed/
-
 │       └── managerSeeder.js
-
 │
-
 ├── index.js
-
 ├── .env
-
 ├── .gitignore
-
 ├── package.json
-
 └── package-lock.json
 ```
-
 ---
-
 ## 5. Main Request Flow
 
-```text
-Client / Postman / Next.js
-
-        ↓
-
-Express Route
-
-        ↓
-
-Auth Middleware
-
-        ↓
-
-Role Middleware
-
-        ↓
-
-Validation
-
-        ↓
-
-Controller
-
-        ↓
-
-Mongoose Model
-
-        ↓
-
-MongoDB
-
-        ↓
-
-JSON Response
+```mermaid
+flowchart TD
+    A["Client / Postman / Next.js"] --> B["Express Route"]
+    B --> C["Auth Middleware"]
+    C --> D["Role Middleware"]
+    D --> E["Validation"]
+    E --> F["Controller"]
+    F --> G["Mongoose Model"]
+    G --> H["MongoDB"]
+    H --> I["JSON Response"]
 ```
 
-Realtime:
+### Realtime Flow
 
 ```mermaid
 flowchart LR
-    A[Controller] --> B[MongoDB save / update]
-    B --> C[Socket.IO emit()]
-    C --> D[Client on()]
-    D --> E[UI update]
+    A["Controller"] --> B["MongoDB Save / Update"]
+    B --> C["Socket.IO Emit"]
+    C --> D["Client Listener"]
+    D --> E["UI Update"]
 ```
-
 ---
-
 ## 6. Important Node / Express Concepts
-
 ### async / await
-
 ```js
 const user = await User.findOne({ email });
-
 const tasks = await Task.find();
-
 await task.save();
 ```
 
@@ -329,7 +218,6 @@ await task.save();
 | `next(error)` | Error handler |
 
 ---
-
 ## 7. MongoDB vs MySQL
 
 | MySQL | MongoDB |
@@ -351,68 +239,47 @@ await task.save();
 | Foreign key | ObjectId reference |
 
 ---
-
 ## 8. Mongoose CRUD Methods
-
 ### Create
-
 ```js
 const task = await Task.create({
-
   title,
-
   assignedTo,
-
   assignedBy
-
 });
 ```
 
 ### Read all
-
 ```js
 const tasks = await Task.find();
 ```
 
 ### Filter
-
 ```js
 const tasks = await Task.find({
-
   assignedTo: req.user.id
-
 });
 ```
 
 ### Find one
-
 ```js
 const user = await User.findOne({ email });
 ```
 
 ### Find by ID
-
 ```js
 const task = await Task.findById(req.params.id);
 ```
 
 ### Update
-
 ```js
 const task = await Task.findByIdAndUpdate(
-
   req.params.id,
-
   req.body,
-
   {
-
     new: true,
-
     runValidators: true
-
   }
-
 );
 ```
 
@@ -421,32 +288,23 @@ const task = await Task.findByIdAndUpdate(
 `runValidators: true` → schema validation update par apply.
 
 ### Save existing document
-
 ```js
 task.status = "working";
-
 await task.save();
 ```
 
 ### Delete
-
 ```js
 await Task.findByIdAndDelete(req.params.id);
 ```
-
 ---
-
 ## 9. populate()
-
 Task model reference:
 
 ```js
 assignedTo: {
-
   type: mongoose.Schema.Types.ObjectId,
-
   ref: "User"
-
 }
 ```
 
@@ -454,9 +312,7 @@ Query:
 
 ```js
 const tasks = await Task.find()
-
   .populate("assignedTo", "name email")
-
   .populate("assignedBy", "name email");
 ```
 
@@ -470,137 +326,77 @@ With populate:
 
 ```json
 {
-
   "assignedTo": {
-
     "_id": "6a7eff0fcf346a6db9fd2001",
-
     "name": "Kiran Solanki",
-
-    "email": "kiran\@test.com"
-
+    "email": "kiran@test.com"
   }
-
 }
 ```
 
 MySQL concept: JOIN.
-
 ---
-
 ## 10. Models
-
 ### User fields
-
 ```text
 name
-
 email
-
 password
-
 role = manager / employee
-
 isActive
-
 createdAt
-
 updatedAt
 ```
 
 ### Task fields
-
 ```text
 title
-
 description
-
 assignedTo
-
 assignedBy
-
 priority = high / medium / low
-
 status = pending / working / hold / completed
-
 assignDate
-
 dueDate
-
 createdAt
-
 updatedAt
 ```
-
 ---
-
 ## 11. Login / JWT Flow
 
-```text
-POST /api/auth/login
-
-        ↓
-
-User.findOne({ email })
-
-        ↓
-
-bcrypt.compare()
-
-        ↓
-
-isActive check
-
-        ↓
-
-jwt.sign()
-
-        ↓
-
-Token + user return
+```mermaid
+flowchart TD
+    A["POST /api/auth/login"] --> B["Find User by Email"]
+    B --> C["Compare Password with bcrypt"]
+    C --> D["Check isActive"]
+    D --> E["Generate JWT"]
+    E --> F["Return Token + User"]
 ```
 
 JWT payload:
 
 ```js
 {
-
   id: user._id,
-
   role: user.role
-
 }
 ```
 
 Auth middleware:
 
-```text
-Authorization: Bearer TOKEN
-
-        ↓
-
-jwt.verify()
-
-        ↓
-
-req.user = decoded
-
-        ↓
-
-next()
+```mermaid
+flowchart TD
+    A["Authorization: Bearer TOKEN"] --> B["Verify JWT"]
+    B --> C["Set req.user = decoded"]
+    C --> D["next"]
 ```
-
 ---
-
 ## 12. Role Authorization
-
 Manager:
 
 ```js
 if (req.user.role !== "manager") {
-
   return res.status(403).json({ message: "Manager access only" });
-
 }
 ```
 
@@ -608,43 +404,33 @@ Employee:
 
 ```js
 if (req.user.role !== "employee") {
-
   return res.status(403).json({ message: "Employee access only" });
-
 }
 ```
-
 ---
-
 ## 13. Validation Flow
 
-```text
-Request → Validator → validateRequest → Controller
-
-              ↓ invalid
-
-            400 error
+```mermaid
+flowchart LR
+    A["Request"] --> B["Validator"]
+    B --> C["validateRequest"]
+    C -->|"Valid"| D["Controller"]
+    C -->|"Invalid"| E["400 Error"]
 ```
 
 Example:
 
 ```js
 body("priority")
-
   .optional()
-
   .isIn(["high", "medium", "low"]);
 ```
-
 ---
-
 ## 14. Socket.IO Core
-
 Simple rule:
 
 ```text
 Sender   = emit()
-
 Receiver = on()
 ```
 
@@ -656,9 +442,7 @@ socket.emit("join-employee", employeeId);
 
 ```js
 socket.on("join-employee", (employeeId) => {
-
   // receive
-
 });
 ```
 
@@ -670,21 +454,15 @@ io.to(room).emit("new-task", task);
 
 ```js
 socket.on("new-task", (task) => {
-
   // receive
-
 });
 ```
-
 ---
-
 ## 15. Socket.IO Rooms
-
 Employee room:
 
 ```js
 const roomName = `employee_${employeeId}`;
-
 socket.join(roomName);
 ```
 
@@ -692,88 +470,57 @@ Manager room:
 
 ```js
 const roomName = `manager_${managerId}`;
-
 socket.join(roomName);
 ```
 
 Purpose: event sabko nahi, required user ko bhejna.
-
 ---
-
 ## 16. Realtime Task Assignment
 
-```text
-Manager → POST /api/tasks → Task.create() → MongoDB
-
-                                      ↓
-
-                           employee_\<assignedTo>
-
-                                      ↓
-
-                              emit("new-task")
-
-                                      ↓
-
-                                Employee UI
+```mermaid
+flowchart LR
+    A["Manager"] --> B["POST /api/tasks"]
+    B --> C["Task.create"]
+    C --> D["MongoDB"]
+    D --> E["Employee Room"]
+    E --> F["Emit: new-task"]
+    F --> G["Employee UI"]
 ```
 
 Controller:
 
 ```js
 const io = req.app.get("io");
-
 const employeeRoom = `employee_${assignedTo}`;
-
 io.to(employeeRoom).emit("new-task", {
-
   message: "New task assigned",
-
   task
-
 });
 ```
-
 ---
-
 ## 17. Realtime Status Update
 
-```text
-Employee → PATCH status → task.save() → MongoDB
-
-                                  ↓
-
-                         manager_\<assignedBy>
-
-                                  ↓
-
-                 emit("task-status-updated")
-
-                                  ↓
-
-                              Manager UI
+```mermaid
+flowchart LR
+    A["Employee"] --> B["PATCH Status"]
+    B --> C["task.save"]
+    C --> D["MongoDB"]
+    D --> E["Manager Room"]
+    E --> F["Emit: task-status-updated"]
+    F --> G["Manager UI"]
 ```
 
 ```js
 const io = req.app.get("io");
-
 const managerRoom = `manager_${task.assignedBy}`;
-
 io.to(managerRoom).emit("task-status-updated", {
-
   taskId: task._id,
-
   employeeId: req.user.id,
-
   status: task.status
-
 });
 ```
-
 ---
-
 ## 18. API URLs
-
 Base URL:
 
 ```text
@@ -833,7 +580,6 @@ http://localhost:3000
 | PATCH | `/api/employee/tasks/:id/status` | Update task status |
 
 ---
-
 ## 19. Common HTTP Status Codes
 
 | Code | Meaning |
@@ -857,9 +603,7 @@ http://localhost:3000
 | 500 | Server error |
 
 ---
-
 ## 20. Security Points
-
 - Password plain text me save nahi karna.
 
 - `bcrypt.hash()` use karna.
@@ -877,11 +621,8 @@ http://localhost:3000
 - Employee sirf apne assigned tasks access kare.
 
 - Employee sirf apne task ka status update kare.
-
 ---
-
 ## 20A. Task Filtering + Pagination
-
 Manager task list supports query parameters such as:
 
 ```text
@@ -896,20 +637,16 @@ Core concepts:
 const page = parseInt(req.query.page) || 1;
 const limit = parseInt(req.query.limit) || 10;
 const skip = (page - 1) * limit;
-
 const filter = {};
-
 if (req.query.employeeId) {
   filter.assignedTo = req.query.employeeId;
 }
-
 const tasks = await Task.find(filter)
   .populate("assignedTo", "name email isActive")
   .populate("assignedBy", "name email")
   .sort({ createdAt: -1 })
   .skip(skip)
   .limit(limit);
-
 const totalTasks = await Task.countDocuments(filter);
 const totalPages = Math.ceil(totalTasks / limit);
 ```
@@ -917,35 +654,35 @@ const totalPages = Math.ceil(totalTasks / limit);
 `req.query` → URL query parameters read karta hai.
 
 `skip()` + `limit()` → MongoDB pagination.
-
 ---
-
 ## 20B. Important Debugging / Learning Fixes
-
 - Frontend `PATCH` aur backend `PUT` mismatch hone par route `404` mila. Final employee status route `PATCH /api/employee/tasks/:id/status` hai.
+
 - `Unexpected token '<'` ka reason tha ki frontend `response.json()` expect kar raha tha, lekin wrong/missing route se HTML 404 response aa raha tha.
+
 - `User is not defined` fix: `employeeTaskController.js` me `User` model import karna zaruri tha before `User.findById(...)`.
+
 - Socket event payload backend/frontend me same shape hona chahiye. Backend direct `{ taskId, employeeId, status }` bhej raha ho to frontend me `data.status` use hoga, `data.task.status` nahi.
+
 - Manager ke paas multiple employees hote hain, isliye realtime status event me `employeeName`, `employeeEmail`, `title`, `taskId`, `status` bhejna useful hai.
+
 - Shared frontend socket ko child page cleanup me `socket.disconnect()` karne se other listeners break ho sakte hain. Prefer exact `socket.off(event, handler)` cleanup.
-
 ---
-
 ## 20C. Backend vs Socket.IO Responsibility
-
-| REST API | Socket.IO |
-|---|---|
-| MongoDB create / update / delete | Realtime notification |
-| Persistent data | Realtime UI synchronization |
-|  | Dashboard count refresh |
-|  | Task list refresh / update |
+```text
+REST API
+→ MongoDB create/update/delete
+→ persistent data
+Socket.IO
+→ realtime notification
+→ realtime UI synchronization
+→ dashboard count refresh
+→ task list refresh/update
+```
 
 Socket.IO database ka replacement nahi hai.
-
 ---
-
 ## 20D. Frontend Notification Persistence Note
-
 Current notifications frontend `localStorage` me persist hoti hain.
 
 Employee-specific keys:
@@ -961,115 +698,69 @@ manager_notifications_<managerId>
 ```
 
 Ye frontend persistence hai. Multiple devices/browsers me permanent notification history chahiye ho to future me MongoDB `notifications` collection add ki ja sakti hai.
-
 ---
-
 ## 21. Current Backend Progress
-
 ```text
 Node.js / Express          ✅
-
 MongoDB / Mongoose         ✅
-
 Manager Login              ✅
-
 Employee Login             ✅
-
 JWT Authentication         ✅
-
 Role Authorization         ✅
-
 Employee CRUD              ✅
-
 Task CRUD                  ✅
-
 Task Assignment            ✅
-
 Employee My Tasks          ✅
-
 Employee Task Detail       ✅
-
 Employee Status Update     ✅
-
 Socket.IO Server           ✅
-
 Socket Rooms               ✅
-
 Realtime New Task Event    ✅
-
 Realtime Status Event      ✅
 ```
-
 ---
-
 ## 22. Quick Revision
+- ****Node.js**** → JavaScript runtime for server-side code
 
-- **Node.js** → JavaScript runtime for server-side code
+- ****Express.js**** → Node.js web/API framework
 
-- **Express.js** → Node.js web/API framework
+- ****MongoDB**** → NoSQL document database
 
-- **MongoDB** → NoSQL document database
+- ****Mongoose**** → MongoDB ODM
 
-- **Mongoose** → MongoDB ODM
+- ****JWT**** → Authentication token
 
-- **JWT** → Authentication token
+- ****bcryptjs**** → Password hashing
 
-- **bcryptjs** → Password hashing
+- ****dotenv**** → `.env` loader
 
-- **dotenv** → `.env` loader
+- ****Nodemon**** → Auto restart dev server
 
-- **Nodemon** → Auto restart dev server
+- ****express-validator**** → Request validation
 
-- **express-validator** → Request validation
+- ****Socket.IO**** → Realtime communication
 
-- **Socket.IO** → Realtime communication
+- ****emit()**** → Send event
 
-- **emit()** → Send event
+- ****on()**** → Receive/listen event
 
-- **on()** → Receive/listen event
+- ****populate()**** → Referenced document details fetch
 
-- **populate()** → Referenced document details fetch
+- ****async/await**** → Promise based async operations
 
-- **async/await** → Promise based async operations
-
-- **middleware** → Request aur controller ke beech processing layer
-
+- ****middleware**** → Request aur controller ke beech processing layer
 ---
-
 ## 23. Final Architecture
 
-```text
-                Next.js Frontend
-
-                       │
-
-            REST API + Socket.IO
-
-                       │
-
-                       ▼
-
-              Node.js + Express
-
-                       │
-
-        ┌──────────────┼──────────────┐
-
-        │              │              │
-
-       JWT         Socket.IO       Validation
-
-        │              │              │
-
-        └──────────────┼──────────────┘
-
-                       │
-
-                    Mongoose
-
-                       │
-
-                       ▼
-
-                    MongoDB
+```mermaid
+flowchart TD
+    A["Next.js Frontend"] --> B["REST API + Socket.IO"]
+    B --> C["Node.js + Express"]
+    C --> D["JWT"]
+    C --> E["Socket.IO"]
+    C --> F["Validation"]
+    D --> G["Mongoose"]
+    E --> G
+    F --> G
+    G --> H["MongoDB"]
 ```
