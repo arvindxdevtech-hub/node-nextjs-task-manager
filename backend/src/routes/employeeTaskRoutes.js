@@ -15,6 +15,6 @@ router.use(employeeOnly);
 
 router.get("/", getMyTasks);
 router.get("/:id", getMyTaskById);
-router.put("/:id/status", updateTaskStatus);
+router.patch("/:id/status", updateTaskStatus);
 
 export default router;

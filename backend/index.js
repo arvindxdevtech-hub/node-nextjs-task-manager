@@ -19,6 +19,7 @@ import dotenv from "dotenv";
 
 // Node.js ka built-in HTTP module
 import http from "http";
+import cors from "cors";
 
 // Socket.IO server
 import { Server } from "socket.io";
@@ -38,6 +39,11 @@ dotenv.config();
 // 1. Express application create
 // ------------------------------------
 const app = express();
+
+app.use(cors({
+    origin: "http://localhost:3001",
+    credentials: true
+}));
 
 
 // JSON request body read karne ke liye

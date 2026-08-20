@@ -1,4 +1,5 @@
 import Task from "../models/Task.js";
+import User from "../models/User.js";
 
 // {{url}}employee/tasks/
 export const getMyTasks = async (req, res, next) => {
@@ -86,6 +87,8 @@ export const updateTaskStatus = async (req, res, next) => {
         // 4. MongoDB me save
         await task.save();
 
+        const employee = await User.findById(req.user.id).select("name email");
+
         // 5. Socket.IO instance lo
         const io = req.app.get("io");
 
@@ -95,8 +98,19 @@ export const updateTaskStatus = async (req, res, next) => {
         // 7. Manager ko realtime event bhejo
         io.to(managerRoom).emit("task-status-updated", {
             message: "Task status updated",
+
             taskId: task._id,
+
+            title: task.title,
+
             employeeId: req.user.id,
+
+            employeeName:
+                employee?.name || "Employee",
+
+            employeeEmail:
+                employee?.email || "",
+
             status: task.status
         });
 

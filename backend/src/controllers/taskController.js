@@ -131,21 +131,20 @@ export const createTask = async (req, res, next) => {
  */
 
 
-export const getTasks = async (req, res, next) => {
+/*export const getTasks = async (req, res, next) => {
     try {
         // populate() kya karta hai? MySQL me tum JOIN use karte:
-        /**
-         * MySQL me tum JOIN use karte:
-            SELECT tasks.*, users.name
-            FROM tasks
-            JOIN users ON tasks.assigned_to = users.id;
+            //MySQL me tum JOIN use karte:
+            // SELECT tasks.*, users.name
+            // FROM tasks
+            // JOIN users ON tasks.assigned_to = users.id;
 
-            MongoDB/Mongoose me conceptually:
+            //MongoDB/Mongoose me conceptually:
 
-            .populate("assignedTo", "name email")
+            //.populate("assignedTo", "name email")
 
-            "name email isActive"=> ye fields select karne ke liye hai, baki fields ko ignore karne ke liye hai.
-         */
+            // "name email isActive"=> ye fields select karne ke liye hai, baki fields ko ignore karne ke liye hai.
+         
         const tasks = await Task.find()
             .populate("assignedTo", "name email isActive")
             .populate("assignedBy", "name email")
@@ -158,6 +157,132 @@ export const getTasks = async (req, res, next) => {
 
     } catch (error) {
         next(error);
+    }
+};*/
+
+// GET /api/tasks?page=1&limit=10&employeeId=...&date=2026-08-20
+export const getTasks = async (req, res, next) => {
+    try {
+        // -----------------------------------------
+        // Query Parameters
+        // -----------------------------------------
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+
+        const employeeId = req.query.employeeId;
+        const date = req.query.date;
+
+
+        // -----------------------------------------
+        // MongoDB Filter Object
+        // -----------------------------------------
+        const filter = {};
+
+
+        // Employee filter
+        if (employeeId) {
+            filter.assignedTo = employeeId;
+        }
+
+
+        // Date filter
+        if (date) {
+
+            const startDate = new Date(date);
+
+            const endDate = new Date(date);
+
+            // Next day
+            endDate.setDate(endDate.getDate() + 1);
+
+
+            filter.assignDate = {
+                $gte: startDate,
+                $lt: endDate
+            };
+        }
+
+
+        // -----------------------------------------
+        // Pagination Calculation
+        // -----------------------------------------
+        const skip = (page - 1) * limit;
+
+
+        // -----------------------------------------
+        // Get Tasks
+        // -----------------------------------------
+        const tasks = await Task.find(filter)
+
+            .populate(
+                "assignedTo",
+                "name email isActive"
+            )
+
+            .populate(
+                "assignedBy",
+                "name email"
+            )
+
+            .sort({
+                createdAt: -1
+            })
+
+            /*MongoDB pagination kar raha hai.
+
+            Example:
+
+            Page 1
+            skip = 0
+            limit = 10
+
+
+            Page 2
+            skip = 10
+            limit = 10
+
+
+            Page 3
+            skip = 20
+            limit = 10*/
+            
+            .skip(skip)
+
+            .limit(limit);
+
+
+        // -----------------------------------------
+        // Total Records
+        // -----------------------------------------
+        const totalTasks =
+            await Task.countDocuments(filter);
+
+
+        const totalPages =
+            Math.ceil(totalTasks / limit);
+
+
+        return res.status(200).json({
+
+            message:
+                "Tasks fetched successfully",
+
+            tasks,
+
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalTasks,
+                limit
+            }
+
+        });
+
+
+    } catch (error) {
+
+        next(error);
+
     }
 };
 
