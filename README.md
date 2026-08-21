@@ -1,8 +1,24 @@
-# Team Task Manager
+# TaskFlow - Team Task Manager
 
-A full-stack **Team Task Management System** built as a practical learning project using **Next.js, Node.js, Express.js, MongoDB, JWT, Tailwind CSS, and Socket.IO**.
+A full-stack **TaskFlow - Team Task Management System** built as a practical learning project using **Next.js, Node.js, Express.js, MongoDB, JWT, Tailwind CSS, and Socket.IO**.
 
 The application provides separate **Manager** and **Employee** portals. Managers can manage employees and assign tasks, while employees can view assigned tasks and update their status. Socket.IO keeps important task changes synchronized in real time.
+
+---
+
+# Screenshots Overview
+
+## Login
+
+![Login](screenshots/01-login.png)
+
+## Manager Dashboard
+
+![Manager Dashboard](screenshots/02-manager-dashboard.png)
+
+## Employee Dashboard
+
+![Employee Dashboard](screenshots/12-employee-dashboard.png)
 
 ---
 
@@ -407,37 +423,6 @@ PATCH /api/employee/tasks/:id/status
 
 # Screenshots
 
-Store project screenshots inside:
-
-```text
-screenshots/
-```
-
-Recommended structure:
-
-```text
-screenshots/
-│
-├── 01-login.png
-├── 02-manager-dashboard.png
-├── 03-manager-employees.png
-├── 04-manager-add-employee.png
-├── 05-manager-view-employee.png
-├── 06-manager-edit-employee.png
-├── 07-manager-task-list.png
-├── 08-manager-assign-task.png
-├── 09-manager-view-task.png
-├── 10-manager-edit-task.png
-├── 11-manager-notifications.png
-├── 12-employee-dashboard.png
-├── 13-employee-task-list.png
-├── 14-employee-task-detail.png
-├── 15-employee-status-update.png
-└── 16-employee-notifications.png
-```
-
-Once screenshots are added, the following sections will render directly on GitHub.
-
 ## Login
 
 ![Login](screenshots/01-login.png)
@@ -466,7 +451,7 @@ Once screenshots are added, the following sections will render directly on GitHu
 
 ![Edit Task](screenshots/10-manager-edit-task.png)
 
-## Manager Notifications
+## Manager Notifications (Socket.IO Server)
 
 ![Manager Notifications](screenshots/11-manager-notifications.png)
 
@@ -478,9 +463,9 @@ Once screenshots are added, the following sections will render directly on GitHu
 
 ![Employee Task List](screenshots/13-employee-task-list.png)
 
-![Employee Task Detail](screenshots/14-employee-task-detail.png)
+![Employee Task Detail & Update Status](screenshots/15-employee-status-update.png)
 
-## Employee Notifications
+## Employee Notifications (Socket.IO Client)
 
 ![Employee Notifications](screenshots/16-employee-notifications.png)
 
@@ -513,7 +498,7 @@ Once screenshots are added, the following sections will render directly on GitHu
 - The project currently uses local MongoDB for development.
 - Frontend notifications are persisted in browser `localStorage`.
 - Realtime communication is handled through Socket.IO.
-- This project is intended for learning, demonstration, and portfolio use.
+- This project is designed for developer learning, client demonstrations, and professional portfolio use.
 
 ---
 
@@ -524,4 +509,4 @@ Senior Full Stack Developer
 
 ## License
 
-This project is available for learning and demonstration purposes.
+This project is available for developer learning and client demonstration purposes.
